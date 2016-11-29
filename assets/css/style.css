@@ -1,0 +1,10 @@
+/*TODO make buttons and images line up correctly */
+
+.topic-button {
+	margin: 20px 0px 20px 10px;
+} 
+
+.gif-space {
+	float: left;
+	margin: 0px 10px;
+}
