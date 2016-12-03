@@ -4,6 +4,8 @@ $(document).ready(function() {
     var topicBtn;
     var gifSpace;
     var img;
+    var still;
+    var animated;
 
     for (var i = 0; i < topics.length; i++) {
         topicBtn = $("<button>");
@@ -12,7 +14,7 @@ $(document).ready(function() {
         $("#buttons").append(topicBtn);
     }
 
-    $(".topic-button").on("click", function() {
+    var displayGifs = function() {
 
         $("#gifs").empty();
         console.log($(this).text());
@@ -22,29 +24,43 @@ $(document).ready(function() {
             console.log(response);
             for (var i = 0; i < response.data.length; i++) {
                 gifSpace = $("<div>");
-                gifSpace.data("index", i);
+                gifSpace.attr("data-state", "still");
                 gifSpace.addClass("gif-space");
                 $("#gifs").append(gifSpace);
-                img = $("<img src='" + response.data[i].images.fixed_height_still.url + "' />");
+                animated = response.data[i].images.fixed_height.url;
+                still = response.data[i].images.fixed_height_still.url;
+                img = $("<img src='" + still + "' />");
+                gifSpace.attr("data-still", still);
+                gifSpace.attr("data-animated", animated);
                 gifSpace.append(img);
                 rating = $("<p>Rating: " + response.data[i].rating + "</p>");
                 gifSpace.append(rating);
             }
-            //TODO make it possible to stop/start gif more than once
-            $(".gif-space").on("click", function() {
-                var index = $(this).data("index");
-                $(this).children().attr("src", response.data[index].images.fixed_height.url);
-                $(this).on("click", function() {
-                    $(this).children().attr("src", response.data[index].images.fixed_height_still.url);
-                });
-            });
         });
-    });
+    };
 
-    //TODO Form to add topic
-    // $("form").on("submit", function(event) {
-    //     event.preventDefault();
-    //     console.log($(this).serialize());
-    // });
+    var playPause = function() {
+        console.log("hello");
+        var state = $(this).attr("data-state");
+        if(state === "still") {
+            $(this).children("img").attr("src", $(this).data("animated"));
+            $(this).attr("data-state", "animated");
+        } else {
+            $(this).children("img").attr("src", $(this).data("still"));
+            $(this).attr("data-state", "still");
+        }
+    };
+
+    $("#add-topic").on("click", function(event) {
+        event.preventDefault();
+        var newTopic = $("#topic-input").val();
+        topicBtn = $("<button>");
+        topicBtn.addClass("btn btn-primary topic-button");
+        topicBtn.text(newTopic);
+        $("#buttons").append(topicBtn);
+     });
+
+    $(document).on("click", ".topic-button", displayGifs);
+    $(document).on("click", ".gif-space", playPause);
 
 });
